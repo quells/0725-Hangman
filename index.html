@@ -7,10 +7,33 @@
 		<title>Hangman</title>
 	</head>
 	<body>
+		<h1>Hangman</h1>
+		<p id="displayWord"></p>
+		<p id="guessedLetters"></p>
+		<p id="guessesRemaining"></p>
+
 		<script src="assets/js/utility.js" charset="utf-8"></script>
 		<script src="assets/js/words_debug.js" charset="utf-8"></script>
 		<script src="assets/js/hangman.js" charset="utf-8"></script>
 		<script type="text/javascript">
+			var game = new HangmanGame(words);
+
+			var displayWordOutlet = document.getElementById("displayWord");
+			var guessedLettersOutlet = document.getElementById("guessedLetters");
+			var guessesRemainingOutlet = document.getElementById("guessesRemaining");
+			function updateUI() {
+				displayWordOutlet.innerHTML = game.displayWord;
+				guessedLettersOutlet.innerHTML = game.guessedLetters;
+				guessesRemainingOutlet.innerHTML = game.guessesRemaining;
+			};
+
+			document.addEventListener("keyup", function(event) {
+				game.handle(event);
+				updateUI();
+			});
+
+			game.newWord();
+			updateUI();
 		</script>
 	</body>
 </html>
