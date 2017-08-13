@@ -16,7 +16,9 @@ var HangmanGame = function(words) {
 		this.currentWord = rai.removed.toLowerCase();
 		this.words = rai.remaining;
 		this.displayWord = Array(this.currentWord.length + 1).join("_");
-		this.missesRemaining = 5; // TODO: scale with difficulty of word
+		// Words vary in length between 5 and 9 (inclusive);
+		// Allow 5 misses minimum, increasing as word length lessens.
+		this.missesRemaining = 23 - this.currentWord.length*2;
 		this.guessedLetters = new Array(26).fill(false);
 	};
 
