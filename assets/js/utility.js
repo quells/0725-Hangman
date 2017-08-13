@@ -15,7 +15,7 @@ function removeAtIndex(arr, i) {
 		result.remaining = arr;
 	} else {
 		result.removed = arr[i];
-		result.remaining = arr.slice(0, i).concat(arr.slice(i+1);)
+		result.remaining = arr.slice(0, i).concat(arr.slice(i+1));
 	}
 
 	return result;
