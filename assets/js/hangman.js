@@ -2,8 +2,8 @@ var HangmanGame = function(words) {
 	this.words = words;
 	this.displayWord = "";
 	this.currentWord = "";
-	this.guessedLetters = new Array();
-	this.guessesRemaining = 0;
+	this.guessedLetters = [];
+	this.missesRemaining = 0;
 	this.correctWords = 0;
 
 	this.newWord = function() {
@@ -15,8 +15,8 @@ var HangmanGame = function(words) {
 		this.currentWord = rai.removed.toLowerCase();
 		this.words = rai.remaining;
 		this.displayWord = Array(this.currentWord.length + 1).join("_");
-		this.guessesRemaining = 5; // TODO: scale with difficulty of word
-		this.guessedLetters = [];
+		this.missesRemaining = 5; // TODO: scale with difficulty of word
+		this.guessedLetters = new Array(26).fill(false);
 	};
 
 	this.handle = function(e) {
@@ -28,8 +28,8 @@ var HangmanGame = function(words) {
 			// if letter has already been guessed, then exit
 			// check if currentWord contains letter
 			// if currentWord contains letter, then reveal in displayWord
-			// else decrement guessesRemaining
-			// if guessesRemaining == 0, then lose round and start with new word
+			// else decrement missesRemaining
+			// if missesRemaining == 0, then lose round and start with new word
 		}
 	};
 
