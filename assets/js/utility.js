@@ -20,3 +20,7 @@ function removeAtIndex(arr, i) {
 
 	return result;
 }
+
+function replaceCharAt(str, i, c) {
+	return str.substr(0, i) + c + str.substr(i+1);
+}
