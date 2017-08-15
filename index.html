@@ -2,22 +2,38 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<!-- <link rel="stylesheet" href="assets/css/reset.css"> -->
-		<link rel="stylesheet" href="assets/css/style.css">
-		<title>Hangman</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
 		<style media="screen">
 			#displayWord {
-				letter-spacing: 5px;
+				letter-spacing: 0.5rem;
 			}
 		</style>
+		<title>Hangman</title>
 	</head>
 	<body>
-		<h1>Hangman</h1>
-		<h2 id="displayWord"></h2>
-		<h3 id="guessedLetters"></h3>
-		<p id="missesRemaining"></p>
-		<p id="correctWords"></p>
-		<p id="missedWords"></p>
+		<div class="container" style="padding-top:2rem;">
+			<div class="card">
+				<div class="card-header">
+					<h1>Hangman</h1>
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+							<canvas id="hangmanCanvas" width="200" height="200"></canvas>
+							<h2 id="displayWord"></h2>
+							<p id="missesRemaining"></p>
+						</div>
+						<div class="col-12 col-sm-6 col-md-8 col-lg-9">
+							<h4 id="guessedLetters"></h4>
+						</div>
+					</div>
+					<hr>
+					<p id="correctWords"></p>
+					<p id="missedWords"></p>
+				</div>
+			</div>
+		</div>
 
 		<script src="assets/js/utility.js" charset="utf-8"></script>
 		<script src="assets/js/words_species.js" charset="utf-8"></script>
@@ -30,6 +46,23 @@
 			var missesRemainingOutlet = document.getElementById("missesRemaining");
 			var correctWordsOutlet = document.getElementById("correctWords");
 			var missedWordsOutlet = document.getElementById("missedWords");
+			var canvas = document.getElementById("hangmanCanvas");
+			var ctx = canvas.getContext("2d");
+
+			function drawGallows() {
+				ctx.strokeStyle = "#000";
+				ctx.lineWidth = 4;
+				ctx.beginPath();
+				ctx.moveTo(0, 198);
+				ctx.lineTo(200, 198);
+				ctx.moveTo(50, 198);
+				ctx.lineTo(50, 2);
+				ctx.lineTo(125, 2);
+				ctx.lineTo(125, 25);
+				ctx.stroke();
+				ctx.closePath();
+			}
+
 			function updateUI() {
 				displayWordOutlet.innerHTML = game.displayWord;
 				var guessedLetters = new Array();
@@ -38,20 +71,25 @@
 						guessedLetters.push(String.fromCharCode(i+97)); // 65 = A, 97 = a
 					}
 				}
-				guessedLettersOutlet.innerHTML = "Guessed letters: " + guessedLetters.join(", ");
+				guessedLettersOutlet.innerHTML = "Guessed Letters:<br>" + guessedLetters.join(", ");
 				missesRemainingOutlet.innerHTML = game.missesRemaining + " misses remaining";
 				correctWordsOutlet.innerHTML = "Correct words: " + game.correctWords.join(", ");
 				missedWordsOutlet.innerHTML = "Missed words: " + game.missedWords.join(", ");
+				canvas.width = canvas.width; // Reset canvas
+				drawGallows();
 			};
 
 			document.addEventListener("keyup", function(event) {
 				try {
 					game.handle(event);
 				} catch(err) {
-					if (err === "No more words") {
-						game.refillWords(words);
-					} else {
-						console.log(err);
+					switch (err) {
+						case "No more words":
+							game.refillWords(words);
+							break;
+						default:
+							console.log(err);
+							break;
 					}
 				} finally {
 					updateUI();
