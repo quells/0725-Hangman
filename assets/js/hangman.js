@@ -18,7 +18,8 @@ var HangmanGame = function(words) {
 		this.displayWord = Array(this.currentWord.length + 1).join("_");
 		// Words vary in length between 5 and 9 (inclusive);
 		// Allow 5 misses minimum, increasing as word length lessens.
-		this.missesRemaining = 23 - this.currentWord.length*2;
+		// this.missesRemaining = 23 - this.currentWord.length*2;
+		this.missesRemaining = 8; // For the purposes of visual hangman
 		this.guessedLetters = new Array(26).fill(false);
 	};
 

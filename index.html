@@ -61,7 +61,79 @@
 				ctx.lineTo(125, 25);
 				ctx.stroke();
 				ctx.closePath();
-			}
+			};
+
+			function drawMan(remaining) {
+				if (remaining > 7) { return; }
+				ctx.strokeStyle = "#000";
+				ctx.lineWidth = 2;
+
+				var x = 125, y = 25;
+				var unit = 20;
+				var width = 1.5*unit;
+
+				// Head
+				ctx.beginPath();
+				ctx.arc(x, y+unit/2, unit/2, 0, 2*Math.PI);
+				ctx.stroke();
+				ctx.closePath();
+				if (remaining > 6) { return; }
+
+				// Body
+				ctx.beginPath();
+				ctx.moveTo(x, y+unit);
+				ctx.lineTo(x, y+4*unit);
+				ctx.stroke();
+				ctx.closePath();
+				if (remaining > 5) { return; }
+
+				// Left arm
+				ctx.beginPath();
+				ctx.moveTo(x, y+1.5*unit);
+				ctx.lineTo(x-0.75*width, y+4.5*unit);
+				ctx.stroke();
+				ctx.closePath();
+				if (remaining > 4) { return; }
+
+				// Right arm
+				ctx.beginPath();
+				ctx.moveTo(x, y+1.5*unit);
+				ctx.lineTo(x+0.75*width, y+4.5*unit);
+				ctx.stroke();
+				ctx.closePath();
+				if (remaining > 3) { return; }
+
+				// Left leg
+				ctx.beginPath();
+				ctx.moveTo(x, y+4*unit);
+				ctx.lineTo(x-0.5*width, y+7*unit);
+				ctx.stroke();
+				ctx.closePath();
+				if (remaining > 2) { return; }
+
+				// Left foot
+				ctx.beginPath();
+				ctx.moveTo(x-0.5*width, y+7*unit);
+				ctx.lineTo(x-width, y+7*unit);
+				ctx.stroke();
+				ctx.closePath();
+				if (remaining > 1) { return; }
+
+				// Right leg
+				ctx.beginPath();
+				ctx.moveTo(x, y+4*unit);
+				ctx.lineTo(x+0.5*width, y+7*unit);
+				ctx.stroke();
+				ctx.closePath();
+				if (remaining > 0) { return; }
+
+				// Right foot
+				ctx.beginPath();
+				ctx.moveTo(x+0.5*width, y+7*unit);
+				ctx.lineTo(x+width, y+7*unit);
+				ctx.stroke();
+				ctx.closePath();
+			};
 
 			function updateUI() {
 				displayWordOutlet.innerHTML = game.displayWord;
@@ -77,6 +149,7 @@
 				missedWordsOutlet.innerHTML = "Missed words: " + game.missedWords.join(", ");
 				canvas.width = canvas.width; // Reset canvas
 				drawGallows();
+				drawMan(game.missesRemaining);
 			};
 
 			document.addEventListener("keyup", function(event) {
