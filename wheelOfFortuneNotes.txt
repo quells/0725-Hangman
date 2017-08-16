@@ -1,0 +1,5 @@
+Blue: #107
+Light blue: #6df
+Light purple: #b8f
+letters: 12 14 14 12
+
