@@ -31,11 +31,11 @@ def regroup(p):
 
 	return gs
 
-for l in lines:
-	rg = regroup(l)
-	for r in rg:
-		print r
-	print ""
+# for l in lines:
+	# rg = regroup(l)
+	# for r in rg:
+		# print r
+	# print ""
 	# print l, [len(r) for r in rg], len(rg)
 	# if not l == " ".join(rg):
 		# print "ERROR", rg
