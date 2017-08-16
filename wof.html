@@ -6,6 +6,16 @@
 	</head>
 	<body>
 		<h1>Disc of Serendipity</h1>
-		<canvas id="dos" width="300" height="300"></canvas>
+		<canvas id="dos" width="250" height="250"></canvas>
+<script src="assets/js/wheel_draw.js" charset="utf-8"></script>
+<script type="text/javascript">
+	var canvas = document.getElementById("dos");
+	var ctx = canvas.getContext("2d");
+
+	var wheelCanvas = wheelCanvasMaker();
+	ctx.translate(canvas.width/2, canvas.height/2);
+	drawWheel(ctx, wheelCanvas, 10*Math.PI/180);
+
+</script>
 	</body>
 </html>
