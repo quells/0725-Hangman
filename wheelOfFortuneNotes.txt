@@ -9,3 +9,7 @@ Wheel: earn money per correct consonant
 2500, Wild00, 900, 700, 600, 800, Gift00, 700, Bankrupt Million Bankrupt, 600, 550, Half Car00, 900, Bankrupt, 650, Free Play, 700, Lose a turn, 800, Prize, 650, Half Car00, 900, Bankrupt
 
 Wild00, Half Car00, Gift00, Freeplay, Lose a turn, Prize -> random(1...9)*100
+
+24 segments, should be symmetrical
+
+1000, 950, 900, 850, 750, 600, Bankrupt, 400, 300, 200, 150, 100, Bankrupt Millionaire Bankrupt, 100, 150, 200, 300, 400, Bankrupt, 600, 750, 850, 900, 950
