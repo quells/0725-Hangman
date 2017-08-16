@@ -7,6 +7,8 @@
 	<body>
 		<h1>Disc of Serendipity</h1>
 		<canvas id="dos" width="250" height="250"></canvas>
+		<button type="button" name="button" onclick="spin();">Spin</button>
+<script src="assets/js/wheel_physics.js" charset="utf-8"></script>
 <script src="assets/js/wheel_draw.js" charset="utf-8"></script>
 <script type="text/javascript">
 	var canvas = document.getElementById("dos");
@@ -14,7 +16,28 @@
 
 	var wheelCanvas = wheelCanvasMaker();
 	ctx.translate(canvas.width/2, canvas.height/2);
-	drawWheel(ctx, wheelCanvas, 10*Math.PI/180);
+
+	var wp = new WheelPhysics(0);
+	var wheelAnimationStart;
+	function renderWheelAnimation() {
+		drawWheel(ctx, wheelCanvas, wp.theta);
+		var delta = Date.now() - wheelAnimationStart;
+		wp.step(delta / 1000);
+		wheelAnimationStart = Date.now();
+		if (wp.omega > 0.05) {
+			requestAnimationFrame(renderWheelAnimation);
+		}
+	}
+
+	function spin() {
+		wp.omega = Math.random()*4 + 4;
+		wheelAnimationStart = Date.now();
+		renderWheelAnimation();
+	}
+
+	drawWheel(ctx, wheelCanvas, wp.theta);
+
+	// drawWheel(ctx, wheelCanvas, 10*Math.PI/180);
 
 </script>
 	</body>
