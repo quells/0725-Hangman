@@ -14,7 +14,7 @@
 	var canvas = document.getElementById("dos");
 	var ctx = canvas.getContext("2d");
 
-	var wheelCanvas = wheelCanvasMaker();
+	var wheelCanvas = newWheelCanvas();
 	ctx.translate(canvas.width/2, canvas.height/2);
 
 	var wp = new WheelPhysics(0);
@@ -44,8 +44,6 @@
 	}
 
 	drawWheel(ctx, wheelCanvas, wp.theta);
-
-	// drawWheel(ctx, wheelCanvas, 10*Math.PI/180);
 
 </script>
 	</body>

@@ -7,7 +7,7 @@ function wheelText(ctx, number, deltaAngle) {
 	}
 }
 
-function wheelCanvasMaker() {
+function newWheelCanvas() {
 	var wheelCanvas = document.createElement("canvas");
 	wheelCanvas.width = 200;
 	wheelCanvas.height = 200;
