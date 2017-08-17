@@ -25,7 +25,8 @@ var WheelPhysics = function(omega) {
 	this.omega = omega;
 
 	this.friction = function(R, V) {
-		return -0.1*(V*V + V + 1);
+		var aV = Math.abs(V)
+		return -0.1*((aV + 1 + 1/aV)*V);
 	};
 
 	this.step = function(h) {

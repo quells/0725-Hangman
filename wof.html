@@ -27,7 +27,7 @@
 		var delta = Date.now() - wheelAnimationStart;
 		wp.step(delta / 1000);
 		wheelAnimationStart = Date.now();
-		if (wp.omega > 0.01) {
+		if (Math.abs(wp.omega) > 0.01) {
 			requestAnimationFrame(renderWheelAnimation);
 		} else {
 			wheelIsSpinning = false;
