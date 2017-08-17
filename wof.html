@@ -6,44 +6,54 @@
 	</head>
 	<body>
 		<h1>Disc of Serendipity</h1>
-		<canvas id="dos" width="250" height="250"></canvas>
-		<button type="button" name="button" onclick="spin();">Spin</button>
-<script src="assets/js/wheel_physics.js" charset="utf-8"></script>
-<script src="assets/js/wheel_draw.js" charset="utf-8"></script>
+		<canvas id="canvas" width="800" height="600"></canvas>
+		<button type="button" name="button" onclick="spinWheel();">Spin</button>
+
+		<script src="assets/js/wheel_physics.js" charset="utf-8"></script>
+		<script src="assets/js/wheel_draw.js" charset="utf-8"></script>
+		<script src="assets/js/letterboard_draw.js" charset="utf-8"></script>
 <script type="text/javascript">
-	var canvas = document.getElementById("dos");
+	var canvas = document.getElementById("canvas");
 	var ctx = canvas.getContext("2d");
 
-	var wheelCanvas = newWheelCanvas();
-	ctx.translate(canvas.width/2, canvas.height/2);
+	var letterBoard = new LetterBoard(24, 30, 10);
 
 	var wp = new WheelPhysics(0);
 	var wheelAnimationStart;
 	var wheelIsSpinning = false;
-	function renderWheelAnimation() {
+	var wheel = new Wheel(wp);
+
+	function drawEverything() {
 		canvas.width = canvas.width;
-		ctx.translate(canvas.width/2, canvas.height/2);
-		drawWheel(ctx, wheelCanvas, wp.theta);
+		letterBoard.update();
+		wheel.update();
+		ctx.drawImage(letterBoard.canvas, 0, 0);
+		ctx.drawImage(wheel.canvas, 0, 0);
+	};
+
+	function renderWheelAnimation() {
 		var delta = Date.now() - wheelAnimationStart;
-		wp.step(delta / 1000);
-		wheelAnimationStart = Date.now();
-		if (Math.abs(wp.omega) > 0.01) {
+		wheel.wheelPhysics.step(delta / 1000);
+
+		drawEverything();
+		if (Math.abs(wheel.wheelPhysics.omega) > 0.01) {
+			wheelAnimationStart = Date.now();
 			requestAnimationFrame(renderWheelAnimation);
 		} else {
 			wheelIsSpinning = false;
 		}
-	}
+	};
 
-	function spin() {
+	function spinWheel() {
 		if (!wheelIsSpinning) {
 			wheelIsSpinning = true;
-			wp.omega = Math.random()*4 + 4;
+			wheel.wheelPhysics.omega = Math.random()*4 + 4;
 			wheelAnimationStart = Date.now();
 			renderWheelAnimation();
 		}
-	}
+	};
 
-	drawWheel(ctx, wheelCanvas, wp.theta);
+	drawEverything();
 
 </script>
 	</body>

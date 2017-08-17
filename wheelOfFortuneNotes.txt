@@ -1,6 +1,7 @@
 Blue: #107
 Light blue: #6df
 Light purple: #b8f
+Green: #184
 letters: 12 14 14 12
 
 Spin the wheel and guess a consonant, buy a vowel ($250) or solve the puzzle
