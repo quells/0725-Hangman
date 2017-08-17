@@ -41,6 +41,7 @@ var LetterBoard = function(charWidth, charHeight, padding) {
 	this.canvas.height = this.bgCanvas.height;
 
 	this.update = function() {
+		this.canvas.width = this.canvas.width;
 		var ctx = this.canvas.getContext("2d");
 		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 		ctx.drawImage(this.bgCanvas, 0, 0);
