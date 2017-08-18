@@ -19,25 +19,30 @@
 
 var WheelGame = function(phrases) {
 	this.state = "NEW_WORD";
-	this.states = ["NEW_WORD", "CHECK_FUNDS", "BUY_VOWEL", "SPINNING", "BANKRUPT", "CHOOSE_CONSONANT", "CHECK_CONSONANT", "PAY_PLAYER", "CHECK_VOWEL"];
-	this.transitions = {
+	this.states = ["NEW_WORD", "CHECK_FUNDS", "BUY_VOWEL", "CHECK_VOWEL", "SPINNING", "BANKRUPT", "CHOOSE_CONSONANT", "CHECK_CONSONANT", "CHECK_PHRASE"];
+	this.allowedTransitions = {
 		"NEW_WORD": ["CHECK_FUNDS"],
 		"CHECK_FUNDS": ["BUY_VOWEL", "SPINNING"],
-		"BUY_VOWEL": ["CHECK_VOWEL", "SPINNING"],
-		"CHECK_VOWEL": ["CHARGE_PLAYER", "CHECK_FUNDS"],
+		"BUY_VOWEL": ["CHECK_VOWEL"],
+		"CHECK_VOWEL": ["CHECK_FUNDS", "CHECK_PHRASE"],
 		"SPINNING": ["BANKRUPT", "CHOOSE_CONSONANT"],
-		"BANKRUPT": ["SPINNING"],
+		"BANKRUPT": ["NEW_WORD"],
 		"CHOOSE_CONSONANT": ["CHECK_CONSONANT"],
-		"CHECK_CONSONANT": ["PAY_PLAYER", "SPINNING"],
-		"PAY_PLAYER": ["CHECK_COMPLETE"],
-		"CHECK_COMPLETE": ["NEW_WORD"]
+		"CHECK_CONSONANT": ["CHECK_FUNDS", "CHECK_PHRASE"],
+		"CHECK_PHRASE": ["CHECK_FUNDS", "NEW_WORD"]
 	};
 
-	this.playerMoney = 0;
+	this.savedFunds = 0;
+	this.currentWordFunds = 0;
 	this.lastSpin = 0;
 
-	this.transitionTo = function(nextState) {
-
+	this.canTransitionTo = function(nextState) {
+		var allowed = this.allowedTransitions[this.state];
+		if (allowed === undefined) { throw "Game is in invalid state" }
+		for (var i = 0; i < allowed.length; i++) {
+			if (allowed[i] == nextState) { return true; }
+		}
+		return false;
 	}
 
 	this.handle = function() {
