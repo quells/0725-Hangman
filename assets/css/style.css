@@ -1,0 +1,92 @@
+html, body {
+	height: 100%;
+}
+body {
+	font-size: 16px;
+	text-align: center;
+	background: #107;
+	font-family: "Passion One", serif;
+	font-weight: 400;
+}
+
+#container {
+	width: 800px;
+	height: 100%;
+	margin: 0 auto;
+	position: relative;
+	text-align: left;
+	border: 8px solid #16a;
+	border-top: none;
+	border-bottom: none;
+	display: flex;
+	flex-direction: column;
+}
+
+.button {
+	background: #fff;
+	color: #000;
+	border: 3px solid #000;
+	border-radius: 8px;
+	font-family: "Passion One", serif;
+	font-weight: 400;
+	font-size: 3em;
+	line-height: 0.8;
+	padding-top: 6px;
+}
+
+h1, h2 {
+	color: #fb3;
+	text-shadow: 4px 4px #210;
+}
+
+h1 {
+	font-weight: 900;
+	font-size: 7.5em;
+	line-height: 0.7;
+	padding: 0.25em 0;
+	text-align: center;
+}
+
+h2 {
+	font-size: 3.0em;
+	text-shadow: 2px 2px #210;
+}
+
+p {
+	font-size: 2.0em;
+	padding-top: 0.5em;
+	color: #fff;
+}
+
+#gameWrapper {
+	width: 800px;
+	height: 350px;
+}
+
+#canvas {
+	position: absolute;
+}
+
+#spinButton {
+	color: #ea2;
+	border-color: #fb3;
+	background: #fd5;
+	position: absolute;
+}
+
+#spinButton:active {
+	color: #c80;
+	border-color: #ea2;
+	background: #fb3;
+}
+
+#spinButton.inactive {
+	color: #999;
+	border-color: #666;
+	background: #bbb;
+}
+
+#scoreboard {
+	flex: 1 0 auto;
+	padding: 0 2em 2em;
+}

@@ -2,12 +2,24 @@
 <html>
 	<head>
 		<meta charset="utf-8">
+		<link rel="stylesheet" href="assets/css/reset.css">
+		<link href="https://fonts.googleapis.com/css?family=Passion+One:400,900" rel="stylesheet">
+		<link rel="stylesheet" href="assets/css/style.css">
 		<title>Disc of Serendipity</title>
 	</head>
 	<body>
-		<h1>Disc of Serendipity</h1>
-		<canvas id="canvas" width="800" height="600"></canvas>
-		<button type="button" name="button" onclick="spinWheel();">Spin</button>
+		<div id="container">
+			<h1>DISC OF SERENDIPITY</h1>
+			<div id="gameWrapper">
+				<canvas id="canvas" width="800" height="350"></canvas>
+				<button id="spinButton" class="button" onmouseup="spinWheel();">SPIN</button>
+			</div>
+			<section id="scoreboard">
+				<h2 id="score">Score: $0</h2>
+				<h2 id="letterValue">Letter Value: $0</h2>
+				<p id="prompt">Spin the wheel.</p>
+			</section>
+		</div>
 
 		<script src="assets/js/utility.js" charset="utf-8"></script>
 		<script src="assets/js/wheel_physics.js" charset="utf-8"></script>
@@ -88,19 +100,60 @@ var WheelGame = function(phrases) {
 	var game = new WheelGame(bna);
 	game.handleCurrentState();
 
-	var letterBoard = new LetterBoard(24, 30, 10);
+	var letterBoard = new LetterBoard(8*4, 8*5, 20);
 
 	var wp = new WheelPhysics(0);
 	var wheelAnimationStart;
 	var wheelIsSpinning = false;
 	var wheel = new Wheel(wp);
 
+	var spinButton = document.getElementById("spinButton");
+	spinButton.style.marginLeft = (letterBoard.canvas.width + 125) + "px";
+	spinButton.style.marginTop = (wheel.canvas.height + 40) + "px";
+
+	var Background = function(w, h) {
+		this.canvas = document.createElement("canvas");
+		this.canvas.width = w;
+		this.canvas.height = h;
+
+		var ctx = this.canvas.getContext("2d");
+		ctx.fillStyle = "#107";
+		ctx.fillRect(0, 0, w, h);
+
+		ctx.strokeStyle = "#3ac";
+		ctx.lineWidth = 4;
+
+		ctx.beginPath();
+		ctx.arc(w*0.4, w*0.75+10, w*0.75, 0, 2*Math.PI);
+		ctx.arc(w*0.6, w*0.80+60, w*0.80, 0, 2*Math.PI);
+		ctx.arc(w*0.35, w*1.18, w, 0, 2*Math.PI);
+		ctx.stroke();
+
+		ctx.strokeStyle = "#b8f";
+		ctx.lineWidth = 2;
+
+		ctx.beginPath();
+		ctx.arc(w*0.4, w*0.75+10, w*0.73, 0, 2*Math.PI);
+		ctx.arc(w*0.6, w*0.80+50, w*0.75, 0, 2*Math.PI);
+		ctx.stroke();
+	}
+	var background = new Background(canvas.width, canvas.height);
+
 	function drawEverything() {
 		canvas.width = canvas.width;
+		letterBoard.phrase = game.displayPhrase;
 		letterBoard.update();
 		wheel.update();
-		ctx.drawImage(letterBoard.canvas, 0, 0);
-		ctx.drawImage(wheel.canvas, letterBoard.canvas.width, 0);
+		ctx.drawImage(background.canvas, 0, 0);
+		ctx.drawImage(letterBoard.canvas, 30, 70);
+		ctx.drawImage(wheel.canvas, letterBoard.canvas.width + 50, 50);
+
+		document.getElementById("score").innerHTML = "Score: $" + (game.savedFunds + game.currentWordFunds);
+		if (game.lastSpin == "BANKRUPT") {
+			document.getElementById("letterValue").innerHTML = "Letter Value: $0";
+		} else {
+			document.getElementById("letterValue").innerHTML = "Letter Value: $" + game.lastSpin;
+		}
 	};
 
 	function renderWheelAnimation() {
@@ -112,12 +165,16 @@ var WheelGame = function(phrases) {
 			wheelAnimationStart = Date.now();
 			requestAnimationFrame(renderWheelAnimation);
 		} else {
+			spinButton.classList.remove("inactive");
 			wheelIsSpinning = false;
+			game.lastSpin = wheel.currentValue();
+			drawEverything();
 		}
 	};
 
 	function spinWheel() {
 		if (!wheelIsSpinning) {
+			spinButton.classList.add("inactive");
 			wheelIsSpinning = true;
 			wheel.wheelPhysics.omega = Math.random()*4 + 4;
 			wheelAnimationStart = Date.now();
