@@ -15,9 +15,10 @@
 				<button id="spinButton" class="button" onmouseup="spinWheel();">SPIN</button>
 			</div>
 			<section id="scoreboard">
-				<h2 id="score">Score: $0</h2>
-				<h2 id="letterValue">Letter Value: $0</h2>
-				<p id="prompt">Spin the wheel.</p>
+				<h2 id="score"></h2>
+				<h2 id="letterValue"></h2>
+				<p id="prompt"></p>
+				<p id="guessedLetters"></p>
 			</section>
 		</div>
 
@@ -49,10 +50,16 @@ var WheelGame = function(phrases) {
 		"CHECK_PHRASE": ["CHECK_FUNDS", "NEW_WORD"]
 	};
 
+	this.spinButton = undefined;
+
 	this.savedFunds = 0;
 	this.currentWordFunds = 0;
 	this.lastSpin = 0;
 	this.canBuyVowel = false;
+	this.canSpinWheel = false;
+	this.prompt = "";
+	this.guessedLetters = [];
+	this.letterToCheck = -1;
 
 	this.canTransitionTo = function(nextState) {
 		var allowed = this.allowedTransitions[this.state];
@@ -61,7 +68,17 @@ var WheelGame = function(phrases) {
 			if (allowed[i] == nextState) { return true; }
 		}
 		return false;
-	}
+	};
+
+	this.transitionTo = function(nextState) {
+		if (this.canTransitionTo(nextState)) {
+			this.state = nextState;
+			this.handleCurrentState();
+			document.drawEverything();
+		} else {
+			throw "Cannot transition from " + this.state + "to " + nextState
+		}
+	};
 
 	this.handleCurrentState = function() {
 		switch (this.state) {
@@ -86,25 +103,104 @@ var WheelGame = function(phrases) {
 					displayPhrase.push(displayChunk);
 				});
 				this.displayPhrase = displayPhrase;
+				this.guessedLetters = new Array(26).fill(false);
+				this.transitionTo("CHECK_FUNDS");
 				break;
 			case "CHECK_FUNDS":
 				if (this.currentWordFunds + this.savedFunds >= 250) {
 					this.canBuyVowel = true;
+					this.prompt = "Spin the wheel or buy a vowel.";
+				} else {
+					this.prompt = "Spin the wheel.";
 				}
+				this.canSpinWheel = true;
+				this.spinButton.classList.remove("inactive");
+				break;
+			case "SPINNING":
+				if (this.lastSpin == "BANKRUPT") {
+					this.transitionTo("BANKRUPT");
+				} else {
+					this.transitionTo("CHOOSE_CONSONANT");
+				}
+				break;
+			case "CHOOSE_CONSONANT":
+				this.prompt = "Choose a consonant.";
+				break;
+			case "CHECK_CONSONANT":
+				if (this.letterToCheck < 0) {
+					throw "Game is in invalid state";
+				}
+				var didFindLetter = false;
+				var letter = String.fromCharCode(this.letterToCheck + 97);
+				console.log(letter);
+				console.log(this.currentPhrase);
+				for (var j = 0; j < this.currentPhrase.length; j++) {
+					var chunk = this.currentPhrase[j];
+					var displayChunk = this.displayPhrase[j];
+					for (var i = 0; i < chunk.length; i++) {
+						if (chunk.charAt(i) == letter) {
+							displayChunk = replaceCharAt(displayChunk, i, letter);
+							didFindLetter = true;
+							this.currentWordFunds += this.lastSpin;
+						}
+					}
+					this.displayPhrase[j] = displayChunk;
+				}
+				if (didFindLetter) {
+					this.transitionTo("CHECK_PHRASE");
+				} else {
+					this.transitionTo("CHECK_FUNDS");
+				}
+				break;
+			case "CHECK_PHRASE":
+				var currentPhrase = this.currentPhrase.join(" ");
+				var displayPhrase = this.displayPhrase.join(" ");
+				if (currentPhrase == displayPhrase) {
+					this.savedFunds += this.currentWordFunds;
+					this.currentWordFunds = 0;
+					this.transitionTo("NEW_WORD");
+				} else {
+					this.transitionTo("CHECK_FUNDS");
+				}
+				break;
 			default:
 				throw "Game is in invalid state";
+				break;
 		}
-	}
-}
+	};
+
+	this.handle = function(event) {
+		switch (this.state) {
+			case "CHOOSE_CONSONANT":
+				if (65 <= event.keyCode && event.keyCode <= 90) {
+					var char = event.keyCode - 65;
+					switch (char) {
+						case 0:
+						case 4:
+						case 8:
+						case 14:
+						case 20:
+							break;
+						default:
+							this.letterToCheck = char;
+							this.transitionTo("CHECK_CONSONANT");
+							break;
+					}
+				}
+				break;
+			default:
+				break;
+		}
+	};
+};
 
 	var game = new WheelGame(bna);
-	game.handleCurrentState();
+	game.spinButton = document.getElementById("spinButton");
 
 	var letterBoard = new LetterBoard(8*4, 8*5, 20);
 
 	var wp = new WheelPhysics(0);
 	var wheelAnimationStart;
-	var wheelIsSpinning = false;
 	var wheel = new Wheel(wp);
 
 	var spinButton = document.getElementById("spinButton");
@@ -139,7 +235,7 @@ var WheelGame = function(phrases) {
 	}
 	var background = new Background(canvas.width, canvas.height);
 
-	function drawEverything() {
+	document.drawEverything = function() {
 		canvas.width = canvas.width;
 		letterBoard.phrase = game.displayPhrase;
 		letterBoard.update();
@@ -154,35 +250,48 @@ var WheelGame = function(phrases) {
 		} else {
 			document.getElementById("letterValue").innerHTML = "Letter Value: $" + game.lastSpin;
 		}
+		document.getElementById("prompt").innerHTML = game.prompt;
+
+		var guessedLetters = new Array();
+		for (var i = 0; i < 26; i++) {
+			if (game.guessedLetters[i]) {
+				guessedLetters.push(String.fromCharCode(i+65)); // 65 = A, 97 = a
+			}
+		}
+		document.getElementById("guessedLetters").innerHTML = guessedLetters.join(", ");
 	};
 
 	function renderWheelAnimation() {
 		var delta = Date.now() - wheelAnimationStart;
 		wheel.wheelPhysics.step(delta / 1000);
 
-		drawEverything();
+		document.drawEverything();
 		if (Math.abs(wheel.wheelPhysics.omega) > 0.01) {
 			wheelAnimationStart = Date.now();
 			requestAnimationFrame(renderWheelAnimation);
 		} else {
-			spinButton.classList.remove("inactive");
-			wheelIsSpinning = false;
+			// spinButton.classList.remove("inactive");
+			// wheelIsSpinning = false;
 			game.lastSpin = wheel.currentValue();
-			drawEverything();
+			game.transitionTo("SPINNING");
 		}
 	};
 
 	function spinWheel() {
-		if (!wheelIsSpinning) {
+		if (game.canSpinWheel) {
 			spinButton.classList.add("inactive");
-			wheelIsSpinning = true;
+			game.canSpinWheel = false;
 			wheel.wheelPhysics.omega = Math.random()*4 + 4;
 			wheelAnimationStart = Date.now();
 			renderWheelAnimation();
 		}
 	};
 
-	drawEverything();
+	document.onkeyup = function(event) {
+		game.handle(event);
+	}
+
+	game.handleCurrentState();
 
 </script>
 	</body>
