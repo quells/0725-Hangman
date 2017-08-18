@@ -78,4 +78,11 @@ var Wheel = function(wheelPhysics) {
 		ctx.rotate(-this.wheelPhysics.theta);
 		ctx.drawImage(this.fgCanvas, -125, -125);
 	};
+
+	this.currentValue = function() {
+		var angle = (this.wheelPhysics.theta / Math.PI * 180 + 15) % 360;
+		var segment = Math.floor(angle / 30);
+		var values = [1000, 750, 500, 250, 100, 900, "BANKRUPT", 900, 100, 250, 500, 750];
+		return values[segment];
+	}
 };
