@@ -34,8 +34,8 @@ var LetterBoard = function(charWidth, charHeight, padding) {
 	}
 
 	this.fgCanvas = document.createElement("canvas");
-	this.fgCanvas.width = 14*charWidth;
-	this.fgCanvas.height = 4*charHeight;
+	this.fgCanvas.width = this.bgCanvas.width;
+	this.fgCanvas.height = this.bgCanvas.height;
 
 	this.canvas = document.createElement("canvas");
 	this.canvas.width = this.bgCanvas.width;
