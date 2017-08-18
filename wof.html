@@ -12,11 +12,14 @@
 		<script src="assets/js/wheel_physics.js" charset="utf-8"></script>
 		<script src="assets/js/wheel_draw.js" charset="utf-8"></script>
 		<script src="assets/js/letterboard_draw.js" charset="utf-8"></script>
+		<script src="assets/js/before_and_after.js" charset="utf-8"></script>
 <script type="text/javascript">
 	var canvas = document.getElementById("canvas");
 	var ctx = canvas.getContext("2d");
 
 	var letterBoard = new LetterBoard(24, 30, 10);
+	bna[0][0] = "_ ____ ___"; // TODO: remove debug
+	letterBoard.phrase = bna[0]; // TODO: choose random phrase
 
 	var wp = new WheelPhysics(0);
 	var wheelAnimationStart;
@@ -28,7 +31,7 @@
 		letterBoard.update();
 		wheel.update();
 		ctx.drawImage(letterBoard.canvas, 0, 0);
-		ctx.drawImage(wheel.canvas, 0, 0);
+		ctx.drawImage(wheel.canvas, letterBoard.canvas.width, 0);
 	};
 
 	function renderWheelAnimation() {
