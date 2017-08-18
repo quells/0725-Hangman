@@ -3,6 +3,7 @@ var LetterBoard = function(charWidth, charHeight, padding) {
 	this.charHeight = charHeight;
 	this.padding = padding;
 	this.bw = 2; // border width
+	this.phrase = [];
 
 	this.bgCanvas = document.createElement("canvas");
 	this.bgCanvas.width = 14*charWidth + 2*padding + this.bw;
@@ -41,10 +42,47 @@ var LetterBoard = function(charWidth, charHeight, padding) {
 	this.canvas.height = this.bgCanvas.height;
 
 	this.update = function() {
-		this.canvas.width = this.canvas.width;
+		// Draw letters from phrase
+		if (this.phrase.length > 0) {
+			var ctx = this.fgCanvas.getContext("2d");
+			ctx.fillStyle = "#eee";
+			for (var i = 0; i < this.phrase.length; i++) {
+				var chunk = this.phrase[i];
+				var offsetX = this.padding + this.bw;
+				var offsetY = this.padding + i*this.charHeight + this.bw;
+				if (i == 0 || i == 3) {
+					offsetX += this.charWidth;
+				}
+				for (var j = 0; j < chunk.length; j++) {
+					var char = chunk[j];
+					if (char != " ") {
+						ctx.fillRect(offsetX + j*this.charWidth, offsetY, charWidth-this.bw, charHeight-this.bw);
+					}
+				}
+			}
+
+			ctx.fillStyle = "#000";
+			ctx.font = this.charWidth + "px sans-serif";
+			ctx.textAlign = "center";
+			for (var i = 0; i < this.phrase.length; i++) {
+				var chunk = this.phrase[i];
+				var offsetX = this.padding + this.bw - 1;
+				var offsetY = this.padding + (i+1)*this.charHeight + this.bw - 5;
+				if (i == 0 || i == 3) {
+					offsetX += this.charWidth;
+				}
+				for (var j = 0; j < chunk.length; j++) {
+					var char = chunk[j];
+					if (char != " " && char != "_") {
+						ctx.fillText(char.toUpperCase(), offsetX + (j+0.5)*this.charWidth, offsetY);
+					}
+				}
+			}
+		}
+
 		var ctx = this.canvas.getContext("2d");
 		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 		ctx.drawImage(this.bgCanvas, 0, 0);
-		// Draw letters from phrase
+		ctx.drawImage(this.fgCanvas, 0, 0);
 	};
 };
