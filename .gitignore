@@ -1,3 +1,4 @@
 .DS_Store
 species.txt
 words.txt
+*.pyc
