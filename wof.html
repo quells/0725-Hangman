@@ -263,7 +263,9 @@ var WheelGame = function(phrases) {
 
 	function renderWheelAnimation() {
 		var delta = Date.now() - wheelAnimationStart;
-		wheel.wheelPhysics.step(delta / 1000);
+		// Tune animation length.
+		// Default is 0.01, smaller values increase animation duration.
+		wheel.wheelPhysics.step(delta * 0.005);
 
 		document.drawEverything();
 		if (Math.abs(wheel.wheelPhysics.omega) > 0.01) {

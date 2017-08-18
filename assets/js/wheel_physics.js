@@ -30,10 +30,8 @@ var WheelPhysics = function(omega) {
 	};
 
 	this.step = function(h) {
-		for (var t = 0; t < 10; t++) {
-			var n = rk4(this.theta, this.omega, this.friction, h);
-			this.theta = n.nR;
-			this.omega = n.nV;
-		}
+		var n = rk4(this.theta, this.omega, this.friction, h);
+		this.theta = n.nR;
+		this.omega = n.nV;
 	};
 }
