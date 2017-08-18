@@ -31,10 +31,21 @@
 					<hr>
 					<p id="correctWords"></p>
 					<p id="missedWords"></p>
+					<div id="spellingWarning">
+						<hr>
+						<div class="alert alert-warning" role="alert">
+							<button type="button" class="close" onclick="closeSpellingWarning()"><span aria-hidden="true">&times;</span></button>
+							<strong>Warning</strong> Words are taken from <em>On the Origin of Species</em>, so may contain British spelling conventions.
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
-
+		<script type="text/javascript">
+			function closeSpellingWarning() {
+				document.getElementById("spellingWarning").style.display = "none";
+			};
+		</script>
 		<script src="assets/js/utility.js" charset="utf-8"></script>
 		<script src="assets/js/words_species.js" charset="utf-8"></script>
 		<script src="assets/js/hangman.js" charset="utf-8"></script>
