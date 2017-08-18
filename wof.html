@@ -17,6 +17,24 @@
 	var canvas = document.getElementById("canvas");
 	var ctx = canvas.getContext("2d");
 
+var WheelGame = function() {
+	this.state = "NEW_GAME";
+	this.states = ["NEW_GAME", "SPINNING", "CONSONANTS", "BUY_VOWEL"];
+
+	this.playerMoney = 0;
+	this.lastSpin = 0;
+
+	this.transition = function() {
+		
+	}
+
+	this.handle = function() {
+
+	}
+}
+
+	var game = new WheelGame();
+
 	var letterBoard = new LetterBoard(24, 30, 10);
 	bna[0][0] = "_ ____ ___"; // TODO: remove debug
 	letterBoard.phrase = bna[0]; // TODO: choose random phrase
