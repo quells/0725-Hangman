@@ -40,6 +40,7 @@ var WheelGame = function(phrases) {
 	this.savedFunds = 0;
 	this.currentWordFunds = 0;
 	this.lastSpin = 0;
+	this.canBuyVowel = false;
 
 	this.canTransitionTo = function(nextState) {
 		var allowed = this.allowedTransitions[this.state];
@@ -74,13 +75,13 @@ var WheelGame = function(phrases) {
 				});
 				this.displayPhrase = displayPhrase;
 				break;
+			case "CHECK_FUNDS":
+				if (this.currentWordFunds + this.savedFunds >= 250) {
+					this.canBuyVowel = true;
+				}
 			default:
 				throw "Game is in invalid state";
 		}
-	}
-
-	this.handle = function() {
-
 	}
 }
 
@@ -88,9 +89,6 @@ var WheelGame = function(phrases) {
 	game.handleCurrentState();
 
 	var letterBoard = new LetterBoard(24, 30, 10);
-	letterBoard.phrase = game.displayPhrase;
-	// bna[0][0] = "_ ____ ___"; // TODO: remove debug
-	// letterBoard.phrase = bna[0]; // TODO: choose random phrase
 
 	var wp = new WheelPhysics(0);
 	var wheelAnimationStart;
