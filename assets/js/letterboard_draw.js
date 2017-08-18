@@ -42,39 +42,31 @@ var LetterBoard = function(charWidth, charHeight, padding) {
 	this.canvas.height = this.bgCanvas.height;
 
 	this.update = function() {
-		// Draw letters from phrase
 		if (this.phrase.length > 0) {
 			var ctx = this.fgCanvas.getContext("2d");
-			ctx.fillStyle = "#eee";
+			ctx.font = this.charWidth + "px sans-serif";
+			ctx.textAlign = "center";
+			var offsetI = (this.phrase.length < 3) ? 1 : 0;
 			for (var i = 0; i < this.phrase.length; i++) {
 				var chunk = this.phrase[i];
 				var offsetX = this.padding + this.bw;
-				var offsetY = this.padding + i*this.charHeight + this.bw;
-				if (i == 0 || i == 3) {
+				var offsetY = this.padding + i*this.charHeight + this.bw + offsetI*this.charHeight;
+				var deltaLength = Math.floor((14 - chunk.length)/2);
+				if (i+offsetI == 0 || i+offsetI == 3) {
 					offsetX += this.charWidth;
+					deltaLength = Math.floor((12 - chunk.length)/2);
 				}
+				offsetX += deltaLength*this.charWidth;
+
 				for (var j = 0; j < chunk.length; j++) {
 					var char = chunk[j];
 					if (char != " ") {
+						ctx.fillStyle = "#eee";
 						ctx.fillRect(offsetX + j*this.charWidth, offsetY, charWidth-this.bw, charHeight-this.bw);
-					}
-				}
-			}
-
-			ctx.fillStyle = "#000";
-			ctx.font = this.charWidth + "px sans-serif";
-			ctx.textAlign = "center";
-			for (var i = 0; i < this.phrase.length; i++) {
-				var chunk = this.phrase[i];
-				var offsetX = this.padding + this.bw - 1;
-				var offsetY = this.padding + (i+1)*this.charHeight + this.bw - 5;
-				if (i == 0 || i == 3) {
-					offsetX += this.charWidth;
-				}
-				for (var j = 0; j < chunk.length; j++) {
-					var char = chunk[j];
-					if (char != " " && char != "_") {
-						ctx.fillText(char.toUpperCase(), offsetX + (j+0.5)*this.charWidth, offsetY);
+						if (char != "_") {
+							ctx.fillStyle = "#000";
+							ctx.fillText(char.toUpperCase(), offsetX + (j+0.5)*this.charWidth - 1, offsetY + this.charHeight*0.75);
+						}
 					}
 				}
 			}
