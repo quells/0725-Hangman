@@ -9,6 +9,7 @@
 		<canvas id="canvas" width="800" height="600"></canvas>
 		<button type="button" name="button" onclick="spinWheel();">Spin</button>
 
+		<script src="assets/js/utility.js" charset="utf-8"></script>
 		<script src="assets/js/wheel_physics.js" charset="utf-8"></script>
 		<script src="assets/js/wheel_draw.js" charset="utf-8"></script>
 		<script src="assets/js/letterboard_draw.js" charset="utf-8"></script>
@@ -18,6 +19,10 @@
 	var ctx = canvas.getContext("2d");
 
 var WheelGame = function(phrases) {
+	this.phrases = phrases;
+	this.currentPhrase = [];
+	this.displayPhrase = [];
+
 	this.state = "NEW_WORD";
 	this.states = ["NEW_WORD", "CHECK_FUNDS", "BUY_VOWEL", "CHECK_VOWEL", "SPINNING", "BANKRUPT", "CHOOSE_CONSONANT", "CHECK_CONSONANT", "CHECK_PHRASE"];
 	this.allowedTransitions = {
@@ -38,11 +43,40 @@ var WheelGame = function(phrases) {
 
 	this.canTransitionTo = function(nextState) {
 		var allowed = this.allowedTransitions[this.state];
-		if (allowed === undefined) { throw "Game is in invalid state" }
+		if (allowed === undefined) { throw "Game is in invalid state"; }
 		for (var i = 0; i < allowed.length; i++) {
 			if (allowed[i] == nextState) { return true; }
 		}
 		return false;
+	}
+
+	this.handleCurrentState = function() {
+		switch (this.state) {
+			case "NEW_WORD":
+				if (this.phrases.length < 1) { throw "Out of phrases"; }
+				var index = randomIndex(this.phrases);
+				var rai = removeAtIndex(this.phrases, index);
+				this.phrases = rai.remaining;
+				this.currentPhrase = rai.removed;
+				var displayPhrase = [];
+				if (this.currentPhrase === undefined) { throw "Invalid phrase"; }
+				this.currentPhrase.forEach(function(chunk) {
+					var displayChunk = "";
+					for (var i = 0; i < chunk.length; i++) {
+						var char = chunk.charAt(i);
+						if (char == " ") {
+							displayChunk += char;
+						} else {
+							displayChunk += "_";
+						}
+					}
+					displayPhrase.push(displayChunk);
+				});
+				this.displayPhrase = displayPhrase;
+				break;
+			default:
+				throw "Game is in invalid state";
+		}
 	}
 
 	this.handle = function() {
@@ -50,11 +84,13 @@ var WheelGame = function(phrases) {
 	}
 }
 
-	var game = new WheelGame();
+	var game = new WheelGame(bna);
+	game.handleCurrentState();
 
 	var letterBoard = new LetterBoard(24, 30, 10);
-	bna[0][0] = "_ ____ ___"; // TODO: remove debug
-	letterBoard.phrase = bna[0]; // TODO: choose random phrase
+	letterBoard.phrase = game.displayPhrase;
+	// bna[0][0] = "_ ____ ___"; // TODO: remove debug
+	// letterBoard.phrase = bna[0]; // TODO: choose random phrase
 
 	var wp = new WheelPhysics(0);
 	var wheelAnimationStart;
