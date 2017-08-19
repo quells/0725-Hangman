@@ -211,6 +211,10 @@ var WheelGame = function(phrases) {
 					this.transitionTo("CHECK_FUNDS");
 				} else {
 					alert("Cannot win this round. Starting with new phrase.");
+					var completedWord = document.createElement("h3");
+					completedWord.innerHTML = this.currentPhrase.join(" ");
+					completedWord.classList.add("missed-word");
+					document.getElementById("scoreboard").appendChild(completedWord);
 					this.transitionTo("NEW_WORD");
 				}
 				break;
@@ -252,7 +256,7 @@ var WheelGame = function(phrases) {
 					this.savedFunds += this.currentWordFunds;
 					this.currentWordFunds = 0;
 					alert("Good job!");
-					var completedWord = document.createElement("h2");
+					var completedWord = document.createElement("h3");
 					completedWord.innerHTML = this.currentPhrase.join(" ");
 					document.getElementById("scoreboard").appendChild(completedWord);
 					this.transitionTo("NEW_WORD");
