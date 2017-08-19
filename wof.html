@@ -79,7 +79,7 @@ var WheelGame = function(phrases) {
 
 	this.transitionTo = function(nextState) {
 		if (this.canTransitionTo(nextState)) {
-			console.log(this.state + " -> " + nextState);
+			// console.log(this.state + " -> " + nextState);
 			this.state = nextState;
 			this.handleCurrentState();
 			document.drawEverything();
@@ -110,7 +110,6 @@ var WheelGame = function(phrases) {
 			buttonElement.classList.remove("inactive");
 			var letterIndex = vowel.charCodeAt(0)-32-65;
 			if (this.guessedLetters[letterIndex]) {
-			console.log(letterIndex);
 				buttonElement.classList.add("inactive");
 			}
 		}
@@ -119,8 +118,6 @@ var WheelGame = function(phrases) {
 	this.dealWithLetter = function(letterValue) {
 		var didFindLetter = false;
 		var letter = String.fromCharCode(this.letterToCheck + 97);
-		console.log(letter);
-		console.log(this.currentPhrase);
 		for (var j = 0; j < this.currentPhrase.length; j++) {
 			var chunk = this.currentPhrase[j];
 			var displayChunk = this.displayPhrase[j];
@@ -144,6 +141,14 @@ var WheelGame = function(phrases) {
 		switch (this.state) {
 			case "NEW_WORD":
 				if (this.phrases.length < 1) { throw "Out of phrases"; }
+
+				this.guessedLetters = new Array(26).fill(false);
+				this.currentWordFunds = 0;
+				this.consonantsRemaining = 0;
+				this.lastSpin = 0;
+				this.canSpinWheel = false;
+				this.letterToCheck = -1;
+
 				var index = randomIndex(this.phrases);
 				var rai = removeAtIndex(this.phrases, index);
 				this.phrases = rai.remaining;
@@ -175,13 +180,6 @@ var WheelGame = function(phrases) {
 					displayPhrase.push(displayChunk);
 				}
 				this.displayPhrase = displayPhrase;
-
-				this.guessedLetters = new Array(26).fill(false);
-				this.currentWordFunds = 0;
-				this.consonantsRemaining = 0;
-				this.lastSpin = 0;
-				this.canSpinWheel = false;
-				this.letterToCheck = -1;
 
 				this.transitionTo("CHECK_FUNDS");
 				break;
@@ -224,23 +222,6 @@ var WheelGame = function(phrases) {
 					throw "Game is in invalid state";
 				}
 				var didFindLetter = this.dealWithLetter(this.lastSpin);
-				// var didFindLetter = false;
-				// var letter = String.fromCharCode(this.letterToCheck + 97);
-				// console.log(letter);
-				// console.log(this.currentPhrase);
-				// for (var j = 0; j < this.currentPhrase.length; j++) {
-				// 	var chunk = this.currentPhrase[j];
-				// 	var displayChunk = this.displayPhrase[j];
-				// 	for (var i = 0; i < chunk.length; i++) {
-				// 		if (chunk.charAt(i) == letter) {
-				// 			displayChunk = replaceCharAt(displayChunk, i, letter);
-				// 			didFindLetter = true;
-				// 			this.currentWordFunds += this.lastSpin;
-				// 			this.consonantsRemaining--;
-				// 		}
-				// 	}
-				// 	this.displayPhrase[j] = displayChunk;
-				// }
 				if (didFindLetter) {
 					this.transitionTo("CHECK_PHRASE");
 				} else {
@@ -428,7 +409,6 @@ var WheelGame = function(phrases) {
 	};
 
 	document.onkeyup = function(event) {
-		console.log(event.keyCode-65)
 		game.handle(event);
 	};
 
