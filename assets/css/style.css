@@ -33,9 +33,25 @@ body {
 	font-size: 3em;
 	line-height: 0.8;
 	padding-top: 6px;
+	min-width: 1.1em;
+
+	position: absolute;
+	margin-top: 290px;
+}
+
+.button:active {
+	color: #c80;
+	border-color: #ea2;
+	background: #fb3;
 }
 
 .button.inactive {
+	color: #999;
+	border-color: #666;
+	background: #bbb;
+}
+
+.button.inactive:active {
 	color: #999;
 	border-color: #666;
 	background: #bbb;
@@ -72,16 +88,6 @@ p {
 
 #canvas {
 	position: absolute;
-}
-
-#spinButton {
-	position: absolute;
-}
-
-#spinButton:active {
-	color: #c80;
-	border-color: #ea2;
-	background: #fb3;
 }
 
 #scoreboard {
