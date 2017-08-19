@@ -175,8 +175,14 @@ var WheelGame = function(phrases) {
 					displayPhrase.push(displayChunk);
 				}
 				this.displayPhrase = displayPhrase;
+
 				this.guessedLetters = new Array(26).fill(false);
 				this.currentWordFunds = 0;
+				this.consonantsRemaining = 0;
+				this.lastSpin = 0;
+				this.canSpinWheel = false;
+				this.letterToCheck = -1;
+
 				this.transitionTo("CHECK_FUNDS");
 				break;
 			case "CHECK_FUNDS":
