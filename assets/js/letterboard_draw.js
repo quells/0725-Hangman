@@ -44,6 +44,7 @@ var LetterBoard = function(charWidth, charHeight, padding) {
 	this.update = function() {
 		if (this.phrase.length > 0) {
 			var ctx = this.fgCanvas.getContext("2d");
+			ctx.clearRect(0, 0, this.fgCanvas.width, this.fgCanvas.height);
 			ctx.font = this.charWidth + "px sans-serif";
 			ctx.textAlign = "center";
 			var offsetI = (this.phrase.length < 3) ? 1 : 0;
