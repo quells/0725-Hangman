@@ -33,132 +33,103 @@
 		<script src="assets/js/wheel_physics.js" charset="utf-8"></script>
 		<script src="assets/js/wheel_draw.js" charset="utf-8"></script>
 		<script src="assets/js/wheel_game.js" charset="utf-8"></script>
+		<script src="assets/js/wheel_background.js" charset="utf-8"></script>
 		<script src="assets/js/letterboard_draw.js" charset="utf-8"></script>
 		<script src="assets/js/before_and_after.js" charset="utf-8"></script>
-<script type="text/javascript">
-	var canvas = document.getElementById("canvas");
-	var ctx = canvas.getContext("2d");
 
-	var game = new WheelGame(bna);
-	game.spinButton = document.getElementById("spinButton");
+		<script type="text/javascript">
+			var canvas = document.getElementById("canvas");
+			var ctx = canvas.getContext("2d");
 
-	var letterBoard = new LetterBoard(8*4, 8*5, 20);
+			var game = new WheelGame(bna);
+			game.spinButton = document.getElementById("spinButton");
 
-	var wp = new WheelPhysics(0);
-	var wheelAnimationStart;
-	var wheel = new Wheel(wp);
+			var letterBoard = new LetterBoard(8*4, 8*5, 20);
 
-	// var spinButton = document.getElementById("spinButton");
-	// spinButton.style.marginLeft = (letterBoard.canvas.width + 125) + "px";
-	// spinButton.style.marginTop = (wheel.canvas.height + 40) + "px"; // 290px
-	var buttons = document.getElementsByClassName("button");
-	for (var i = 0; i < buttons.length; i++) {
-		var marginLeft = 0;
-		if (buttons[i].id == "spinButton") {
-			marginLeft = letterBoard.canvas.width + 125;
-		} else {
-			marginLeft = (i-1)*65 + 32;
-		}
-		buttons[i].style.marginLeft = marginLeft + "px";
-	}
+			var wp = new WheelPhysics(0);
+			var wheelAnimationStart;
+			var wheel = new Wheel(wp);
 
-	var Background = function(w, h) {
-		this.canvas = document.createElement("canvas");
-		this.canvas.width = w;
-		this.canvas.height = h;
-
-		var ctx = this.canvas.getContext("2d");
-		ctx.fillStyle = "#107";
-		ctx.fillRect(0, 0, w, h);
-
-		ctx.strokeStyle = "#3ac";
-		ctx.lineWidth = 4;
-
-		ctx.beginPath();
-		ctx.arc(w*0.4, w*0.75+10, w*0.75, 0, 2*Math.PI);
-		ctx.arc(w*0.6, w*0.80+60, w*0.80, 0, 2*Math.PI);
-		ctx.arc(w*0.35, w*1.18, w, 0, 2*Math.PI);
-		ctx.stroke();
-
-		ctx.strokeStyle = "#b8f";
-		ctx.lineWidth = 2;
-
-		ctx.beginPath();
-		ctx.arc(w*0.4, w*0.75+10, w*0.73, 0, 2*Math.PI);
-		ctx.arc(w*0.6, w*0.80+50, w*0.75, 0, 2*Math.PI);
-		ctx.stroke();
-	}
-	var background = new Background(canvas.width, canvas.height);
-
-	document.drawEverything = function() {
-		canvas.width = canvas.width;
-		letterBoard.phrase = game.displayPhrase;
-		letterBoard.update();
-		wheel.update();
-		ctx.drawImage(background.canvas, 0, 0);
-		ctx.drawImage(letterBoard.canvas, 30, 70);
-		ctx.drawImage(wheel.canvas, letterBoard.canvas.width + 50, 50);
-
-		document.getElementById("score").innerHTML = "Score: $" + (game.savedFunds + game.currentWordFunds);
-		if (game.lastSpin == "BANKRUPT") {
-			document.getElementById("letterValue").innerHTML = "Letter Value: $0";
-		} else {
-			document.getElementById("letterValue").innerHTML = "Letter Value: $" + game.lastSpin;
-		}
-		document.getElementById("prompt").innerHTML = game.prompt;
-
-		var guessedLetters = new Array();
-		for (var i = 0; i < 26; i++) {
-			if (game.guessedLetters[i]) {
-				guessedLetters.push(String.fromCharCode(i+65)); // 65 = A, 97 = a
+			var buttons = document.getElementsByClassName("button");
+			for (var i = 0; i < buttons.length; i++) {
+				var marginLeft = 0;
+				if (buttons[i].id == "spinButton") {
+					marginLeft = letterBoard.canvas.width + 125;
+				} else {
+					marginLeft = (i-1)*65 + 32;
+				}
+				buttons[i].style.marginLeft = marginLeft + "px";
 			}
-		}
-		document.getElementById("guessedLetters").innerHTML = guessedLetters.join(", ");
-	};
 
-	function renderWheelAnimation() {
-		var delta = Date.now() - wheelAnimationStart;
-		// Tune animation length.
-		// Default is 0.01, smaller values increase animation duration.
-		wheel.wheelPhysics.step(delta * 0.005);
+			var background = new Background(canvas.width, canvas.height);
 
-		document.drawEverything();
-		if (Math.abs(wheel.wheelPhysics.omega) > 0.01) {
-			wheelAnimationStart = Date.now();
-			requestAnimationFrame(renderWheelAnimation);
-		} else {
-			// spinButton.classList.remove("inactive");
-			// wheelIsSpinning = false;
-			game.lastSpin = wheel.currentValue();
-			game.transitionTo("HAS_SPUN");
-		}
-	};
+			document.drawEverything = function() {
+				canvas.width = canvas.width;
+				letterBoard.phrase = game.displayPhrase;
+				letterBoard.update();
+				wheel.update();
+				ctx.drawImage(background.canvas, 0, 0);
+				ctx.drawImage(letterBoard.canvas, 30, 70);
+				ctx.drawImage(wheel.canvas, letterBoard.canvas.width + 50, 50);
 
-	function spinWheel() {
-		if (game.canSpinWheel) {
-			game.transitionTo("SPINNING");
-			wheel.wheelPhysics.omega = Math.random()*4 + 4;
-			wheelAnimationStart = Date.now();
-			renderWheelAnimation();
-		}
-	};
+				document.getElementById("score").innerHTML = "Score: $" + (game.savedFunds + game.currentWordFunds);
+				if (game.lastSpin == "BANKRUPT") {
+					document.getElementById("letterValue").innerHTML = "Letter Value: $0";
+				} else {
+					document.getElementById("letterValue").innerHTML = "Letter Value: $" + game.lastSpin;
+				}
+				document.getElementById("prompt").innerHTML = game.prompt;
 
-	function buyVowel(char) {
-		if (game.canBuyVowel()) {
-			if (!game.guessedLetters[char]) {
-				game.guessedLetters[char] = true;
-				game.letterToCheck = char;
-				game.transitionTo("CHECK_VOWEL");
-			}
-		}
-	};
+				var guessedLetters = new Array();
+				for (var i = 0; i < 26; i++) {
+					if (game.guessedLetters[i]) {
+						guessedLetters.push(String.fromCharCode(i+65)); // 65 = A, 97 = a
+					}
+				}
+				document.getElementById("guessedLetters").innerHTML = guessedLetters.join(", ");
+			};
 
-	document.onkeyup = function(event) {
-		game.handle(event);
-	};
+			function renderWheelAnimation() {
+				var delta = Date.now() - wheelAnimationStart;
+				// Tune animation length.
+				// Default is 0.01, smaller values increase animation duration.
+				wheel.wheelPhysics.step(delta * 0.005);
 
-	game.handleCurrentState();
+				document.drawEverything();
+				if (Math.abs(wheel.wheelPhysics.omega) > 0.01) {
+					wheelAnimationStart = Date.now();
+					requestAnimationFrame(renderWheelAnimation);
+				} else {
+					game.lastSpin = wheel.currentValue();
+					game.transitionTo("HAS_SPUN");
+				}
+			};
 
-</script>
+			function spinWheel() {
+				if (game.canSpinWheel) {
+					game.transitionTo("SPINNING");
+					wheel.wheelPhysics.omega = Math.random()*4 + 4;
+					wheelAnimationStart = Date.now();
+					renderWheelAnimation();
+				}
+			};
+
+			function buyVowel(char) {
+				if (game.canBuyVowel()) {
+					if (!game.guessedLetters[char]) {
+						game.guessedLetters[char] = true;
+						game.letterToCheck = char;
+						game.transitionTo("CHECK_VOWEL");
+					}
+				}
+			};
+
+			document.onkeyup = function(event) {
+				game.handle(event);
+			};
+
+			game.handleCurrentState();
+
+		</script>
 	</body>
 </html>
