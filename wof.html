@@ -129,7 +129,10 @@ var WheelGame = function(phrases) {
 					displayChunk = replaceCharAt(displayChunk, i, letter);
 					didFindLetter = true;
 					this.currentWordFunds += letterValue;
-					this.consonantsRemaining--;
+					if (letterValue > 0) {
+						// Ignore vowels
+						this.consonantsRemaining--;
+					}
 				}
 			}
 			this.displayPhrase[j] = displayChunk;
