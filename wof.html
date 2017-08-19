@@ -13,12 +13,19 @@
 			<div id="gameWrapper">
 				<canvas id="canvas" width="800" height="350"></canvas>
 				<button id="spinButton" class="button" onmouseup="spinWheel();">SPIN</button>
+				<button id="aButton" class="button inactive" onmouseup="buyVowel(0);">A</button>
+				<button id="eButton" class="button inactive" onmouseup="buyVowel(4);">E</button>
+				<button id="iButton" class="button inactive" onmouseup="buyVowel(8);">I</button>
+				<button id="oButton" class="button inactive" onmouseup="buyVowel(14);">O</button>
+				<button id="uButton" class="button inactive" onmouseup="buyVowel(20);">U</button>
 			</div>
 			<section id="scoreboard">
+				<br><br>
 				<h2 id="score"></h2>
 				<h2 id="letterValue"></h2>
 				<p id="prompt"></p>
 				<p id="guessedLetters"></p>
+				<br>
 			</section>
 		</div>
 
@@ -35,16 +42,17 @@ var WheelGame = function(phrases) {
 	this.phrases = phrases;
 	this.currentPhrase = [];
 	this.displayPhrase = [];
+	this.consonantsRemaining = 0;
 
 	this.state = "NEW_WORD";
-	this.states = ["NEW_WORD", "CHECK_FUNDS", "BUY_VOWEL", "CHECK_VOWEL", "SPINNING", "BANKRUPT", "CHOOSE_CONSONANT", "CHECK_CONSONANT", "CHECK_PHRASE"];
+	this.states = ["NEW_WORD", "CHECK_FUNDS", "BUY_VOWEL", "CHECK_VOWEL", "SPINNING", "HAS_SPUN", "BANKRUPT", "CHOOSE_CONSONANT", "CHECK_CONSONANT", "CHECK_PHRASE"];
 	this.allowedTransitions = {
 		"NEW_WORD": ["CHECK_FUNDS"],
-		"CHECK_FUNDS": ["BUY_VOWEL", "SPINNING"],
-		"BUY_VOWEL": ["CHECK_VOWEL"],
+		"CHECK_FUNDS": ["CHECK_VOWEL", "SPINNING"],
 		"CHECK_VOWEL": ["CHECK_FUNDS", "CHECK_PHRASE"],
-		"SPINNING": ["BANKRUPT", "CHOOSE_CONSONANT"],
-		"BANKRUPT": ["NEW_WORD"],
+		"SPINNING": ["HAS_SPUN"],
+		"HAS_SPUN": ["BANKRUPT", "CHOOSE_CONSONANT"],
+		"BANKRUPT": ["NEW_WORD", "CHECK_FUNDS"],
 		"CHOOSE_CONSONANT": ["CHECK_CONSONANT"],
 		"CHECK_CONSONANT": ["CHECK_FUNDS", "CHECK_PHRASE"],
 		"CHECK_PHRASE": ["CHECK_FUNDS", "NEW_WORD"]
@@ -55,7 +63,6 @@ var WheelGame = function(phrases) {
 	this.savedFunds = 0;
 	this.currentWordFunds = 0;
 	this.lastSpin = 0;
-	this.canBuyVowel = false;
 	this.canSpinWheel = false;
 	this.prompt = "";
 	this.guessedLetters = [];
@@ -72,13 +79,63 @@ var WheelGame = function(phrases) {
 
 	this.transitionTo = function(nextState) {
 		if (this.canTransitionTo(nextState)) {
+			console.log(this.state + " -> " + nextState);
 			this.state = nextState;
 			this.handleCurrentState();
 			document.drawEverything();
 		} else {
-			throw "Cannot transition from " + this.state + "to " + nextState
+			throw "Cannot transition from " + this.state + " to " + nextState;
 		}
 	};
+
+	this.canBuyVowel = function() {
+		return this.canTransitionTo("CHECK_VOWEL") && (this.currentWordFunds + this.savedFunds >= 250);
+	}
+
+	this.inactivateVowelButtons = function() {
+		var vowels = ["a", "e", "i", "o", "u"];
+		for (var i = 0; i < 5; i++) {
+			var vowel = vowels[i];
+			var buttonElement = document.getElementById(vowel + "Button");
+			buttonElement.classList.remove("inactive");
+			buttonElement.classList.add("inactive");
+		}
+	}
+
+	this.activateVowelButtons = function() {
+		var vowels = ["a", "e", "i", "o", "u"];
+		for (var i = 0; i < 5; i++) {
+			var vowel = vowels[i];
+			var buttonElement = document.getElementById(vowel + "Button");
+			buttonElement.classList.remove("inactive");
+			var letterIndex = vowel.charCodeAt(0)-32-65;
+			if (this.guessedLetters[letterIndex]) {
+			console.log(letterIndex);
+				buttonElement.classList.add("inactive");
+			}
+		}
+	}
+
+	this.dealWithLetter = function(letterValue) {
+		var didFindLetter = false;
+		var letter = String.fromCharCode(this.letterToCheck + 97);
+		console.log(letter);
+		console.log(this.currentPhrase);
+		for (var j = 0; j < this.currentPhrase.length; j++) {
+			var chunk = this.currentPhrase[j];
+			var displayChunk = this.displayPhrase[j];
+			for (var i = 0; i < chunk.length; i++) {
+				if (chunk.charAt(i) == letter) {
+					displayChunk = replaceCharAt(displayChunk, i, letter);
+					didFindLetter = true;
+					this.currentWordFunds += letterValue;
+					this.consonantsRemaining--;
+				}
+			}
+			this.displayPhrase[j] = displayChunk;
+		}
+		return didFindLetter;
+	}
 
 	this.handleCurrentState = function() {
 		switch (this.state) {
@@ -90,7 +147,8 @@ var WheelGame = function(phrases) {
 				this.currentPhrase = rai.removed;
 				var displayPhrase = [];
 				if (this.currentPhrase === undefined) { throw "Invalid phrase"; }
-				this.currentPhrase.forEach(function(chunk) {
+				for (var j = 0; j < this.currentPhrase.length; j++) {
+					var chunk = this.currentPhrase[j];
 					var displayChunk = "";
 					for (var i = 0; i < chunk.length; i++) {
 						var char = chunk.charAt(i);
@@ -98,18 +156,31 @@ var WheelGame = function(phrases) {
 							displayChunk += char;
 						} else {
 							displayChunk += "_";
+							switch (char) {
+								case "a":
+								case "e":
+								case "i":
+								case "o":
+								case "u":
+									break;
+								default:
+									this.consonantsRemaining++;
+									break;
+							}
 						}
 					}
 					displayPhrase.push(displayChunk);
-				});
+				}
 				this.displayPhrase = displayPhrase;
 				this.guessedLetters = new Array(26).fill(false);
+				this.currentWordFunds = 0;
 				this.transitionTo("CHECK_FUNDS");
 				break;
 			case "CHECK_FUNDS":
-				if (this.currentWordFunds + this.savedFunds >= 250) {
-					this.canBuyVowel = true;
+				this.inactivateVowelButtons();
+				if (this.canBuyVowel()) {
 					this.prompt = "Spin the wheel or buy a vowel.";
+					this.activateVowelButtons();
 				} else {
 					this.prompt = "Spin the wheel.";
 				}
@@ -117,10 +188,23 @@ var WheelGame = function(phrases) {
 				this.spinButton.classList.remove("inactive");
 				break;
 			case "SPINNING":
+				this.spinButton.classList.add("inactive");
+				this.canSpinWheel = false;
+				break;
+			case "HAS_SPUN":
 				if (this.lastSpin == "BANKRUPT") {
 					this.transitionTo("BANKRUPT");
 				} else {
 					this.transitionTo("CHOOSE_CONSONANT");
+				}
+				break;
+			case "BANKRUPT":
+				if (this.consonantsRemaining > 0) {
+					this.currentWordFunds = 0;
+					this.transitionTo("CHECK_FUNDS");
+				} else {
+					alert("Cannot win this round. Starting with new phrase.");
+					this.transitionTo("NEW_WORD");
 				}
 				break;
 			case "CHOOSE_CONSONANT":
@@ -130,22 +214,41 @@ var WheelGame = function(phrases) {
 				if (this.letterToCheck < 0) {
 					throw "Game is in invalid state";
 				}
-				var didFindLetter = false;
-				var letter = String.fromCharCode(this.letterToCheck + 97);
-				console.log(letter);
-				console.log(this.currentPhrase);
-				for (var j = 0; j < this.currentPhrase.length; j++) {
-					var chunk = this.currentPhrase[j];
-					var displayChunk = this.displayPhrase[j];
-					for (var i = 0; i < chunk.length; i++) {
-						if (chunk.charAt(i) == letter) {
-							displayChunk = replaceCharAt(displayChunk, i, letter);
-							didFindLetter = true;
-							this.currentWordFunds += this.lastSpin;
-						}
-					}
-					this.displayPhrase[j] = displayChunk;
+				var didFindLetter = this.dealWithLetter(this.lastSpin);
+				// var didFindLetter = false;
+				// var letter = String.fromCharCode(this.letterToCheck + 97);
+				// console.log(letter);
+				// console.log(this.currentPhrase);
+				// for (var j = 0; j < this.currentPhrase.length; j++) {
+				// 	var chunk = this.currentPhrase[j];
+				// 	var displayChunk = this.displayPhrase[j];
+				// 	for (var i = 0; i < chunk.length; i++) {
+				// 		if (chunk.charAt(i) == letter) {
+				// 			displayChunk = replaceCharAt(displayChunk, i, letter);
+				// 			didFindLetter = true;
+				// 			this.currentWordFunds += this.lastSpin;
+				// 			this.consonantsRemaining--;
+				// 		}
+				// 	}
+				// 	this.displayPhrase[j] = displayChunk;
+				// }
+				if (didFindLetter) {
+					this.transitionTo("CHECK_PHRASE");
+				} else {
+					this.transitionTo("CHECK_FUNDS");
 				}
+				break;
+			case "CHECK_VOWEL":
+				if (this.letterToCheck < 0) {
+					throw "Game is in invalid state";
+				}
+				this.currentWordFunds -= 250;
+				if (this.currentWordFunds < 0) {
+					// Overdraft
+					this.savedFunds += this.currentWordFunds;
+					this.currentWordFunds = 0;
+				}
+				var didFindLetter = this.dealWithLetter(0);
 				if (didFindLetter) {
 					this.transitionTo("CHECK_PHRASE");
 				} else {
@@ -158,6 +261,10 @@ var WheelGame = function(phrases) {
 				if (currentPhrase == displayPhrase) {
 					this.savedFunds += this.currentWordFunds;
 					this.currentWordFunds = 0;
+					alert("Good job!");
+					var completedWord = document.createElement("h2");
+					completedWord.innerHTML = this.currentPhrase.join(" ");
+					document.getElementById("scoreboard").appendChild(completedWord);
 					this.transitionTo("NEW_WORD");
 				} else {
 					this.transitionTo("CHECK_FUNDS");
@@ -182,8 +289,11 @@ var WheelGame = function(phrases) {
 						case 20:
 							break;
 						default:
-							this.letterToCheck = char;
-							this.transitionTo("CHECK_CONSONANT");
+							if (!this.guessedLetters[char]) {
+								this.guessedLetters[char] = true;
+								this.letterToCheck = char;
+								this.transitionTo("CHECK_CONSONANT");
+							}
 							break;
 					}
 				}
@@ -203,9 +313,19 @@ var WheelGame = function(phrases) {
 	var wheelAnimationStart;
 	var wheel = new Wheel(wp);
 
-	var spinButton = document.getElementById("spinButton");
-	spinButton.style.marginLeft = (letterBoard.canvas.width + 125) + "px";
-	spinButton.style.marginTop = (wheel.canvas.height + 40) + "px";
+	// var spinButton = document.getElementById("spinButton");
+	// spinButton.style.marginLeft = (letterBoard.canvas.width + 125) + "px";
+	// spinButton.style.marginTop = (wheel.canvas.height + 40) + "px"; // 290px
+	var buttons = document.getElementsByClassName("button");
+	for (var i = 0; i < buttons.length; i++) {
+		var marginLeft = 0;
+		if (buttons[i].id == "spinButton") {
+			marginLeft = letterBoard.canvas.width + 125;
+		} else {
+			marginLeft = (i-1)*65 + 32;
+		}
+		buttons[i].style.marginLeft = marginLeft + "px";
+	}
 
 	var Background = function(w, h) {
 		this.canvas = document.createElement("canvas");
@@ -275,23 +395,33 @@ var WheelGame = function(phrases) {
 			// spinButton.classList.remove("inactive");
 			// wheelIsSpinning = false;
 			game.lastSpin = wheel.currentValue();
-			game.transitionTo("SPINNING");
+			game.transitionTo("HAS_SPUN");
 		}
 	};
 
 	function spinWheel() {
 		if (game.canSpinWheel) {
-			spinButton.classList.add("inactive");
-			game.canSpinWheel = false;
+			game.transitionTo("SPINNING");
 			wheel.wheelPhysics.omega = Math.random()*4 + 4;
 			wheelAnimationStart = Date.now();
 			renderWheelAnimation();
 		}
 	};
 
+	function buyVowel(char) {
+		if (game.canBuyVowel()) {
+			if (!game.guessedLetters[char]) {
+				game.guessedLetters[char] = true;
+				game.letterToCheck = char;
+				game.transitionTo("CHECK_VOWEL");
+			}
+		}
+	};
+
 	document.onkeyup = function(event) {
+		console.log(event.keyCode-65)
 		game.handle(event);
-	}
+	};
 
 	game.handleCurrentState();
 
